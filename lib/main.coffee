@@ -15,6 +15,7 @@ applyDefaults = (options) ->
   options.onDebug or= ->
   #options.username or= null
   #options.password or= null
+  options.authdb or= 'admin'
   return options
 
 class MongoWatch
