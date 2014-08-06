@@ -1,7 +1,7 @@
 {getTimestamp} = require './util'
 connect = require './connect'
 
-module.exports = ({host, port, dbOpts, username, password, useMasterOplog}, done) ->
+module.exports = ({host, port, dbOpts, username, password, useMasterOplog, lastOplogTime}, done) ->
   connect {db: 'local', host, port, dbOpts, username, password}, (err, oplogClient) =>
     return done new Error "Error connecting to database: #{err}" if err
 
@@ -21,7 +21,8 @@ module.exports = ({host, port, dbOpts, username, password, useMasterOplog}, done
       oplog.find({}, {ts: 1}).sort({$natural: -1}).limit(1).toArray (err, data) ->
 
         # start listening at the last record if there is one, otherwise use the javascript time
-        lastOplogTime = data?[0]?.ts
+        if not lastOplogTime?
+          lastOplogTime = data?[0]?.ts
         if lastOplogTime
           timeQuery = {$gt: lastOplogTime}
         else
